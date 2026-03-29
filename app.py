@@ -66,6 +66,7 @@ st.title("🔎 LangChain - Chat with Search")
 st.markdown("""
 Ask me anything! I can search the web, Wikipedia, and academic papers to answer your questions.
 """)
+st.secret["GROQ_API_KEY"]
 
 ## Sidebar
 st.sidebar.title("⚙️ Settings")
