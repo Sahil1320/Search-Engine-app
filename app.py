@@ -1,9 +1,6 @@
 import streamlit as st
 from langchain_groq import ChatGroq
-from langchain_community.utilities import ArxivAPIWrapper, WikipediaAPIWrapper
-from langchain_community.tools import DuckDuckGoSearchRun
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.messages import HumanMessage, AIMessage
 import os
 from dotenv import load_dotenv
 
@@ -11,42 +8,37 @@ load_dotenv()
 
 st.set_page_config(page_title="Search Chatbot", page_icon="🔎", layout="wide")
 
-## Initialize tools
-@st.cache_resource
-def get_search_tools():
-    """Initialize search tools"""
-    search = DuckDuckGoSearchRun()
-    wiki = WikipediaAPIWrapper(top_k_results=1, doc_content_chars_max=500)
-    arxiv_wrapper = ArxivAPIWrapper(top_k_results=1, doc_content_chars_max=500)
-    return search, wiki, arxiv_wrapper
-
-search_tool, wiki_tool, arxiv_tool = get_search_tools()
-
 def search_web(query):
-    """Search the web"""
+    """Search the web using DuckDuckGo"""
     try:
-        result = search_tool.run(query)
+        from langchain_community.tools import DuckDuckGoSearchRun
+        search = DuckDuckGoSearchRun()
+        result = search.run(query)
         return f"🌐 Web Search Results:\n{result}"
     except Exception as e:
-        return f"Web search failed: {str(e)}"
+        return f"⚠️ Web search unavailable: {str(e)}\n\nPlease try using Wikipedia instead."
 
 def search_wikipedia(query):
     """Search Wikipedia"""
     try:
-        result = wiki_tool.run(query)
+        from langchain_community.utilities import WikipediaAPIWrapper
+        wiki = WikipediaAPIWrapper(top_k_results=1, doc_content_chars_max=500)
+        result = wiki.run(query)
         return f"📚 Wikipedia:\n{result}"
     except Exception as e:
-        return f"Wikipedia search failed: {str(e)}"
+        return f"⚠️ Wikipedia search failed: {str(e)}"
 
 def search_arxiv(query):
-    """Search Arxiv"""
+    """Search Arxiv for academic papers"""
     try:
+        from langchain_community.utilities import ArxivAPIWrapper
         from langchain_community.tools import ArxivQueryRun
-        arxiv_search = ArxivQueryRun(api_wrapper=arxiv_tool)
+        arxiv_wrapper = ArxivAPIWrapper(top_k_results=1, doc_content_chars_max=500)
+        arxiv_search = ArxivQueryRun(api_wrapper=arxiv_wrapper)
         result = arxiv_search.run(query)
         return f"🎓 Arxiv Papers:\n{result}"
     except Exception as e:
-        return f"Arxiv search failed: {str(e)}"
+        return f"⚠️ Arxiv search failed: {str(e)}"
 
 def get_answer(question, search_results, model, api_key):
     """Get AI answer based on search results"""
@@ -66,7 +58,6 @@ st.title("🔎 LangChain - Chat with Search")
 st.markdown("""
 Ask me anything! I can search the web, Wikipedia, and academic papers to answer your questions.
 """)
-st.secret["GROQ_API_KEY"]
 
 ## Sidebar
 st.sidebar.title("⚙️ Settings")
