@@ -38,7 +38,13 @@ def search_arxiv(query):
         result = arxiv_search.run(query)
         return f"🎓 Arxiv Papers:\n{result}"
     except Exception as e:
-        return f"⚠️ Arxiv search failed: {str(e)}"
+        error_msg = str(e)
+        if "503" in error_msg or "429" in error_msg:
+            return f"⚠️ Arxiv is temporarily unavailable (rate limited). This is normal - Arxiv has strict usage limits.\n\n💡 Tip: The AI will still provide a good answer using Web Search and Wikipedia results!"
+        elif "HTTP" in error_msg:
+            return f"⚠️ Arxiv server error. Don't worry - continuing with other search sources."
+        else:
+            return f"⚠️ Arxiv search unavailable: {error_msg}"
 
 def get_answer(question, search_results, model, api_key):
     """Get AI answer based on search results"""
