@@ -4,7 +4,7 @@
 
 An intelligent chatbot that searches the web, Wikipedia, and academic papers to answer your questions. Built with a simple, reliable architecture.
 
-Live Link: Live[https://search-engine-app-etvpfasxywkzlkujnagnkp.streamlit.app/]
+Live Link: ["https://search-engine-app-etvpfasxywkzlkujnagnkp.streamlit.app/"]
 
 ## ✨ What's New
 
